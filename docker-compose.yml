@@ -1,4 +1,3 @@
-version: '3.7'
 networks:
   privnet:
 
@@ -49,6 +48,24 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - privnet
+
+  locust-master:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H http://backend:3000
+    networks:
+      - privnet
+
+  locust-worker:
+    image: locustio/locust
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust-master
     networks:
       - privnet
 
